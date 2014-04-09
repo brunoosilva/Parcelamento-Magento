@@ -1,0 +1,28 @@
+// Lembre que esse código deve fica dentro do foreach da lista de produtos
+<?php foreach ($_productCollection as $_product): ?>
+ 
+// Adicione esse código a baixo, aonde quer que exiba "ou 2x de R$ 25,00"
+<?php
+//Pega o preço do produto
+$preco_produto = $_product->getPrice();
+//Pega a quantidade de parcelas máxima configurada no produto
+$qtdcartao = $_product->getqtdcartao();
+//Pega o valor mínimo de parcela sem juros
+$valor_minimo_sjuros = $_product->getResource()->getAttribute('valorminimoparcela');
+//Divide o valor do produto, pela quantidade máxima de parcela
+$preco_parcela = $preco_produto / $qtdcartao;
+//Verifica se tem juros de acréscimo na parcela, lembrando que ela tem que ser maior que o valor minimo sem juros
+if( $_product->gettipojuroscartao() == 1 && $preco_parcela < $valor_minimo_sjuros):
+    //Captura o juros em % configurado no produto
+    $porcentagem_juros = $_product->getjuroscartao();
+    //Converter o juros em decimal para calcular no PHP
+    $porcentagem_juros = $porcentagem_juros / 100;
+    //Somar o juros com o valor
+    $preco_parcela = ( $preco_parcela * $porcentagem_juros ) + $preco_parcela;
+endif;
+ 
+//Formata o valor para moeda
+$preco_parcela = number_format($preco_parcela, 2,',','.');
+?>
+ 
+<div>ou <span><?php echo $qtdcartao;?>x</span> de <span>R$ <?php echo $preco_parcela; ?></span></div>
