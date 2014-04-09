@@ -1,0 +1,41 @@
+//Lembrando que o código tem que está abaixo desta variável
+<?php $_product = $this->getProduct(); ?>
+ 
+<?php
+//Pega o preço do produto
+$preco_produto = $_product->getPrice();
+//Pega a quantidade de parcelas máxima configurada no produto
+$qtdcartao = $_product->getqtdcartao();
+//Pega o valor mínimo de parcela sem juros
+$valor_minimo_sjuros = $_product->getResource()->getAttribute('valorminimoparcela');
+?>
+ 
+<strong>Parcelas:</strong>
+<ul>
+<?php for( $i=1; $i<=$qtdcartao; $i++ ): ?>
+ 
+<?php
+// Calcula a parcela e verifica se ela tem juros
+$preco_parcela = $preco_produto / $i;
+$texto_juros = "sem juros";
+ 
+if( $_product->gettipojuroscartao() == 1 && $preco_parcela < $valor_minimo_sjuros ):
+//Captura o juros em % configurado no produto
+$porcentagem_juros = $_product->getjuroscartao();
+//Converter o juros em decimal para calcular no PHP
+$porcentagem_juros = $porcentagem_juros / 100;
+//Somar o juros com o valor
+$preco_parcela = ( $preco_parcela * $porcentagem_juros ) + $preco_parcela;
+ 
+$texto_juros = "com juros";
+endif;
+?>
+ 
+<?php if( $i==1 ): //Caso for a primeira parcela apresenta diferente ?>
+<li><?php echo $i; ?>x <strong>R$ <?php echo number_format($preco_parcela, 2, ',', '.');?></strong></li>
+<?php else: ?>
+<li><?php echo $i; ?>x <strong>R$ <?php echo number_format($preco_parcela, 2, ',', '.');?></strong> <?php echo $texto_juros?> = R$ <?php echo number_format( $i * $preco_parcela, 2, ',', '.'); ?></li>
+<?php endif;?>
+ 
+<?php endfor; ?>
+</ul>
